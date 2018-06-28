@@ -5,7 +5,7 @@ mongoose.connect('mongodb://localhost/mongo-exercises')
 .catch(err => console.error('Could not connect', err));
 
 const courseSchema = new mongoose.Schema({
-    name: String,
+    name: {type: String, required: true},
     author: String,
     tags: [String],
     date: {type: Date, default: Date.now},
@@ -16,13 +16,18 @@ const Course = mongoose.model('Course', courseSchema);
 
 async function createCourse(){
     const course = new Course({
-        name: 'Angular Course',
+       
         author: 'Mosh',
         tags: ['angular', 'frontend'],
         isPublished: true
     });
+try {
     const result = await course.save();
     console.log(result);
+} catch (error) {
+    console.log(error.message);
+}
+
 }
 
 async function getCourses(){
@@ -52,4 +57,4 @@ async function updateCourse(id){
     console.log(result);
 }
 
-updateCourse('5a68fdf95db93f6477053ddd');
+createCourse();
