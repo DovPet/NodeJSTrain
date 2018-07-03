@@ -1,10 +1,14 @@
+//const asyncMiddleware = require('../middleware/async');
 const {Genre} = require('../models/genre');
 const Joi = require('joi');
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
     //get
-    router.get('/', async (req, res) =>{
+    router.get('/', async (req, res) =>{   
+        throw new Error('Erroras');    
         const genres = await Genre.find().sort('name');
         res.send(genres);
     });
@@ -17,7 +21,7 @@ const router = express.Router();
     });
     
     //post
-    router.post('/', async (req, res) =>{
+    router.post('/', auth,async (req, res) =>{
     
         const schema = {
             name: Joi.string().min(3).required()
@@ -30,7 +34,7 @@ const router = express.Router();
     });
     
     //put
-    router.put('/:id', async (req, res) =>{
+    router.put('/:id', auth,async (req, res) =>{
         const schema = {
             name: Joi.string().min(3).required()
         };
@@ -47,7 +51,7 @@ const router = express.Router();
     
     
     //delete
-    router.delete('/:id', async (req, res) =>{
+    router.delete('/:id', [auth, admin] ,async (req, res) =>{
         const genre = await Genre.findByIdAndRemove(req.params.id);
         
         if (!genre) return res.status(404).send(`Genre with Id of ${req.params.id} was not found`);

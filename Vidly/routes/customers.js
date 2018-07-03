@@ -2,7 +2,7 @@ const {Customer} = require('../models/customer');
 const Joi = require('joi');
 const express = require('express');
 const router = express.Router();
-
+const auth = require('../middleware/auth');
 
 router.get('/', async (req, res) =>{
     const customers = await Customer.find().sort('name');
@@ -19,7 +19,7 @@ router.get('/:id', async (req, res) => {
   });
 
 //post
-router.post('/', async (req, res) =>{
+router.post('/',auth, async (req, res) =>{
 
     const schema = {
         name: Joi.string().min(5).max(50).required(),
@@ -39,7 +39,7 @@ router.post('/', async (req, res) =>{
 });
 
 //put
-router.put('/:id', async (req, res) =>{
+router.put('/:id',auth, async (req, res) =>{
     const schema = {
         name: Joi.string().min(5).max(50).required(),
         phone: Joi.string().min(5).max(15).required(),
@@ -66,7 +66,7 @@ router.put('/:id', async (req, res) =>{
 
 
 //delete
-router.delete('/:id', async (req, res) =>{
+router.delete('/:id', auth,async (req, res) =>{
     const customer = await Customer.findByIdAndRemove(req.params.id);
     
     if (!customer) return res.status(404).send(`Customer with Id of ${req.params.id} was not found`);
