@@ -9,5 +9,6 @@ require('./startup/db')();
 require('./startup/config')(); 
 require('./startup/validation')(); 
 //server
-app.listen(5000, () => winston.info('Mano portas yra 5000...'));
+const server = app.listen(5000, () => winston.info('Mano portas yra 5000...'));
 
+module.exports = server;

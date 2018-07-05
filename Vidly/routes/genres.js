@@ -4,30 +4,34 @@ const Joi = require('joi');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const validateObjectId = require('../middleware/validateObjectId');
 const admin = require('../middleware/admin');
 
     //get
-    router.get('/', async (req, res) =>{   
-        throw new Error('Erroras');    
+    router.get('/', async (req, res) =>{       
         const genres = await Genre.find().sort('name');
         res.send(genres);
     });
     
     //get (by id)
-    router.get('/:id', async (req, res) =>{
-        const genre = await Genre.findById(req.param.id);
-        if (!genre) return res.status(404).send(`Genre with Id of ${req.params.id} was not found`);
+    router.get('/:id',validateObjectId, async (req, res) => {
+
+        const genre = await Genre.findById(req.params.id);
+      
+        if (!genre) return res.status(404).send('The genre with the given ID was not found.');
+      
         res.send(genre);
-    });
+      });
     
     //post
-    router.post('/', auth,async (req, res) =>{
+    router.post('/',auth,async (req, res) =>{
     
         const schema = {
-            name: Joi.string().min(3).required()
+            name: Joi.string().min(5).max(50).required()
+
         };
         const result = Joi.validate(req.body,schema);   
-        if(result.error) return res.send(result.error.details[0].message);   
+        if(result.error) return res.status(400).send(result.error.details[0].message);   
         const genre = new Genre({ name: req.body.name });
         await genre.save();
         res.send(genre);
@@ -36,7 +40,7 @@ const admin = require('../middleware/admin');
     //put
     router.put('/:id', auth,async (req, res) =>{
         const schema = {
-            name: Joi.string().min(3).required()
+            name: Joi.string().min(5).max(50).required()
         };
         const result = Joi.validate(req.body,schema);   
         if(result.error) return res.status(400).send(result.error.details[0].message);
